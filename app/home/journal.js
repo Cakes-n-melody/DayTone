@@ -1,3 +1,4 @@
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -10,6 +11,10 @@ import { deleteMood, getAllMoods, moodLayout } from "../../utils/storage";
 
 export default function Journal() {
   const [entries, setEntries] = useState([]);
+  const [showStart, setShowStart] = useState(false);
+  const [showEnd, setShowEnd] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -30,15 +35,87 @@ export default function Journal() {
     load();
   }, []);
 
+  const showStartPicker = () => {
+    setShowStart(true);
+  };
+
+  const showEndPicker = () => {
+    setShowEnd(true);
+  };
+
+  const onChangeStart = (event, selectedDate) => {
+    setShowStart(false);
+
+    if (selectedDate) {
+      setStartDate(selectedDate);
+      console.log("start = " + startDate);
+    }
+  };
+
+  const onChangeEnd = (event, selectedDate) => {
+    setShowEnd(false);
+
+    if (selectedDate) {
+      setEndDate(selectedDate);
+      console.log("end = " + endDate);
+    }
+  };
+
+  const displayedEntries = entries.filter((entry) => {
+    if (!startDate || !endDate) return true;
+    const entryDate = new Date(entry.date);
+    entryDate.setHours(0, 0, 0, 0);
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    return entryDate >= start && entryDate <= end;
+  });
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Your Journal</Text>
 
+      <View style={styles.datesGrid}>
+        <TouchableOpacity style={styles.datesBtn} onPress={showStartPicker}>
+          <Text style={styles.deleteText}>Start Date</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.datesBtn} onPress={showEndPicker}>
+          <Text style={styles.deleteText}>End Date</Text>
+        </TouchableOpacity>
+
+        {showStart && (
+          <RNDateTimePicker
+            value={startDate || new Date()}
+            onChange={onChangeStart}
+          />
+        )}
+        {showEnd && (
+          <RNDateTimePicker
+            value={endDate || new Date()}
+            onChange={onChangeEnd}
+          />
+        )}
+
+        {(startDate || endDate) && (
+          <TouchableOpacity
+            style={[styles.deleteBtn, { width: "100%" }]}
+            onPress={() => {
+              setStartDate(null);
+              setEndDate(null);
+            }}
+          >
+            <Text style={styles.deleteText}>Clear filter</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
       <ScrollView style={styles.scroll}>
-        {entries.length === 0 ? (
+        {displayedEntries.length === 0 ? (
           <Text style={styles.empty}>No entries yet</Text>
         ) : (
-          entries.map((entry) => (
+          displayedEntries.map((entry) => (
             <View key={entry.date} style={styles.entryCard}>
               <Text style={styles.entryDate}>Date: {entry.date}</Text>
 
@@ -95,6 +172,23 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingVertical: 6,
     backgroundColor: "#80231f",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+
+  datesGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    padding: 10,
+    width: "100%",
+  },
+
+  datesBtn: {
+    marginTop: 10,
+    width: "49%",
+    paddingVertical: 6,
+    backgroundColor: "#383838",
     borderRadius: 8,
     alignItems: "center",
   },

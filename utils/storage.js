@@ -1,10 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const MOODS_KEY = "DAYTONE_MOODS_V1";
+const DELETED_MOODS_KEY = "DAYTONE_DELETED_MOODS_V1";
 
 export const moodLayout = ["Awful.", "Meh.", "Okay.", "Good.", "Fantastic."];
 export const month = new Date().getMonth() + 1;
-export let deletedMoods = [];
 
 function normalizeColourFromMood(mood) {
   const map = {
@@ -66,14 +66,29 @@ export async function saveMood(date, { mood, note }) {
   }
 }
 
+export async function getDeletedMoods() {
+  try {
+    const raw = await AsyncStorage.getItem(DELETED_MOODS_KEY);
+    if (!raw) {
+      return {};
+    }
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error("Failed to get Deleted moods", error);
+    return {};
+  }
+}
+
 export async function deleteMood(date) {
   try {
     const moods = await getAllMoods();
+    const deletedMoods = await getDeletedMoods();
     if (moods[date]) {
-      deletedMoods.push(moods[date]);
+      deletedMoods[date] = moods[date];
       console.log(deletedMoods);
       delete moods[date];
     }
+    await AsyncStorage.setItem(DELETED_MOODS_KEY, JSON.stringify(deletedMoods));
     await AsyncStorage.setItem(MOODS_KEY, JSON.stringify(moods));
     return moods;
   } catch (error) {
