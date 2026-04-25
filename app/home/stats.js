@@ -115,13 +115,17 @@ function computedStats(moods) {
   const commonMood = Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0];
 
   let streak = 1;
-  for (let i = dates.length - 1; i > 0; i++) {
+  for (let i = dates.length - 1; i > 0; i--) {
     const cur = new Date(dates[i]);
     const prev = new Date(dates[i - 1]);
 
-    const diff = (cur - prev) / (1000 * 60 * 60 * 24);
+    console.log(dates[dates.length - 2]);
+    console.log(cur + "\n" + prev);
+    console.log(cur - prev);
+
+    const diff = (prev - cur) / (1000 * 60 * 60 * 24);
     if (diff === 1) streak++;
-    else break;
+    else streak = 1;
   }
 
   return {

@@ -4,6 +4,7 @@ const MOODS_KEY = "DAYTONE_MOODS_V1";
 
 export const moodLayout = ["Awful.", "Meh.", "Okay.", "Good.", "Fantastic."];
 export const month = new Date().getMonth() + 1;
+export let deletedMoods = [];
 
 function normalizeColourFromMood(mood) {
   const map = {
@@ -68,7 +69,11 @@ export async function saveMood(date, { mood, note }) {
 export async function deleteMood(date) {
   try {
     const moods = await getAllMoods();
-    if (moods[date]) delete moods[date];
+    if (moods[date]) {
+      deletedMoods.push(moods[date]);
+      console.log(deletedMoods);
+      delete moods[date];
+    }
     await AsyncStorage.setItem(MOODS_KEY, JSON.stringify(moods));
     return moods;
   } catch (error) {
