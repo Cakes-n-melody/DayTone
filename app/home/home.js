@@ -178,7 +178,8 @@ const styles = StyleSheet.create({
   footerText: {
     marginTop: 6,
     color: "#8a8178",
-    fontSize: 12,
+    fontSize: 11,
+    fontFamily: "serif",
     textAlign: "center",
   },
 });

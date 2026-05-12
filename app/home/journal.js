@@ -1,4 +1,3 @@
-import RNDateTimePicker from "@react-native-community/datetimepicker";
 import { useEffect, useState } from "react";
 import {
   ScrollView,
@@ -7,14 +6,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import DateTimePicker, { useDefaultStyles } from "react-native-ui-datepicker";
 import { deleteMood, getAllMoods, moodLayout } from "../../utils/storage";
 
 export default function Journal() {
   const [entries, setEntries] = useState([]);
-  const [showStart, setShowStart] = useState(false);
-  const [showEnd, setShowEnd] = useState(false);
+  const [show, setShow] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const defaultStyles = useDefaultStyles();
 
   useEffect(() => {
     async function load() {
@@ -35,30 +35,8 @@ export default function Journal() {
     load();
   }, []);
 
-  const showStartPicker = () => {
-    setShowStart(true);
-  };
-
-  const showEndPicker = () => {
-    setShowEnd(true);
-  };
-
-  const onChangeStart = (event, selectedDate) => {
-    setShowStart(false);
-
-    if (selectedDate) {
-      setStartDate(selectedDate);
-      console.log("start = " + startDate);
-    }
-  };
-
-  const onChangeEnd = (event, selectedDate) => {
-    setShowEnd(false);
-
-    if (selectedDate) {
-      setEndDate(selectedDate);
-      console.log("end = " + endDate);
-    }
+  const showPicker = () => {
+    setShow(true);
   };
 
   const displayedEntries = entries.filter((entry) => {
@@ -76,40 +54,77 @@ export default function Journal() {
     <View style={styles.container}>
       <Text style={styles.title}>Your Journal</Text>
 
-      <View style={styles.datesGrid}>
-        <TouchableOpacity style={styles.datesBtn} onPress={showStartPicker}>
-          <Text style={styles.deleteText}>Start Date</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.datesBtn} onPress={showPicker}>
+        <Text style={styles.deleteText}>Date Range</Text>
+      </TouchableOpacity>
 
-        <TouchableOpacity style={styles.datesBtn} onPress={showEndPicker}>
-          <Text style={styles.deleteText}>End Date</Text>
-        </TouchableOpacity>
+      {show && (
+        <View style={styles.datePicker}>
+          <DateTimePicker
+            styles={{
+              ...defaultStyles,
 
-        {showStart && (
-          <RNDateTimePicker
-            value={startDate || new Date()}
-            onChange={onChangeStart}
-          />
-        )}
-        {showEnd && (
-          <RNDateTimePicker
-            value={endDate || new Date()}
-            onChange={onChangeEnd}
-          />
-        )}
+              container: { backgroundColor: "#1a1918" },
+              header_text: {
+                color: "#EAE3D7",
+                fontFamily: "serif",
+                fontWeight: "bold",
+              },
 
-        {(startDate || endDate) && (
-          <TouchableOpacity
-            style={[styles.deleteBtn, { width: "100%" }]}
-            onPress={() => {
-              setStartDate(null);
-              setEndDate(null);
+              day_name_text: {
+                color: "#C6BFB4",
+                fontFamily: "serif",
+                fontWeight: "600",
+              },
+
+              day_text: { color: "#EAE3D7", fontFamily: "serif" },
+
+              today: {
+                borderColor: "#80231f",
+                borderWidth: 1.5,
+                backgroundColor: "transparent",
+              },
+              today_label: { color: "#EAE3D7", fontWeight: "bold" },
+
+              selected: {
+                backgroundColor: "#80231f",
+                borderRadius: 8,
+              },
+              selected_label: {
+                color: "#F5E9E5",
+                fontWeight: "bold",
+              },
+
+              range_fill: {
+                backgroundColor: "#383838",
+              },
             }}
-          >
-            <Text style={styles.deleteText}>Clear filter</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+            mode="range"
+            startDate={startDate}
+            endDate={endDate}
+            onChange={(params) => {
+              setStartDate(params.startDate);
+              setEndDate(params.endDate);
+
+              if (params.startDate && params.endDate) {
+                setShow(false);
+              }
+            }}
+          />
+        </View>
+      )}
+
+      {startDate && endDate && (
+        <TouchableOpacity
+          style={[styles.deleteBtn, { width: "100%", marginBottom: 10 }]}
+          onPress={() => {
+            setStartDate(null);
+            setEndDate(null);
+          }}
+        >
+          <Text style={styles.deleteText}>Clear filter</Text>
+        </TouchableOpacity>
+      )}
 
       <ScrollView style={styles.scroll}>
         {displayedEntries.length === 0 ? (
@@ -176,31 +191,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  datesGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    padding: 10,
-    width: "100%",
-  },
-
   datesBtn: {
     marginTop: 10,
-    width: "49%",
+    marginBottom: 10,
     paddingVertical: 6,
-    backgroundColor: "#383838",
+    backgroundColor: "#2b2b2b",
     borderRadius: 8,
     alignItems: "center",
   },
 
   deleteText: {
     color: "#F5E9E5",
-    fontWeight: "600",
+    fontFamily: "serif",
+    fontWeight: "700",
     fontSize: 14,
   },
 
   scroll: {
     flex: 1,
+  },
+
+  datePicker: {
+    backgroundColor: "#1a1918",
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 10,
+    width: "100%",
   },
 
   empty: {
@@ -221,7 +237,8 @@ const styles = StyleSheet.create({
   entryDate: {
     color: "#EAE3D7",
     fontSize: 18,
-    fontWeight: "600",
+    fontFamily: "serif",
+    fontWeight: "700",
     marginBottom: 4,
   },
 
@@ -240,12 +257,14 @@ const styles = StyleSheet.create({
 
   entryMood: {
     color: "#C6BFB4",
+    fontFamily: "serif",
     fontSize: 14,
   },
 
   entryText: {
     color: "#EAE3D7",
     fontSize: 15,
+    fontFamily: "serif",
     lineHeight: 20,
     marginTop: 4,
   },
