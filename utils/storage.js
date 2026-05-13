@@ -14,7 +14,7 @@ function normalizeColourFromMood(mood) {
     4: "#9fb987",
     5: "#6a8c6e",
   };
-  return map[mood] || "ece7df";
+  return map[mood] || "#ece7df";
 }
 
 export var quoteNumber = Math.floor(Math.random() * 172);
@@ -94,5 +94,57 @@ export async function deleteMood(date) {
   } catch (error) {
     console.error("Failed to delete mood from storage", error);
     return null;
+  }
+}
+
+export async function permanentlyDeleteMood() {
+  try {
+    const emptyTrash = {};
+
+    await AsyncStorage.setItem(DELETED_MOODS_KEY, JSON.stringify(emptyTrash));
+
+    return emptyTrash;
+  } catch (error) {
+    console.error("Failed to permanently delete mood from storage", error);
+    return null;
+  }
+}
+
+export async function saveSetting(key, value) {
+  try {
+    await AsyncStorage.setItem(`@setting_${key}`, JSON.stringify(value));
+    console.log(`Saved ${key}`, value);
+  } catch (error) {
+    console.error(`Failed to save setting ${key}`);
+  }
+}
+
+export async function getSetting(key, defaultValue = null) {
+  try {
+    const JsonValue = await AsyncStorage.getItem(`@setting_${key}`);
+    if (JsonValue != null) {
+      return JSON.parse(JsonValue);
+    }
+    return defaultValue;
+  } catch (error) {
+    console.error(`Failed to get ${key}`);
+    return defaultValue;
+  }
+}
+
+export async function removeDeletedMood(date) {
+  try {
+    const deletedMoods = await getDeletedMoods();
+
+    // If the mood exists in the trash, delete it and save the updated trash
+    if (deletedMoods && deletedMoods[date]) {
+      delete deletedMoods[date];
+      await AsyncStorage.setItem(
+        DELETED_MOODS_KEY,
+        JSON.stringify(deletedMoods),
+      );
+    }
+  } catch (error) {
+    console.error("Failed to remove mood from trash", error);
   }
 }

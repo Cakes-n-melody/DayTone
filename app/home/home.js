@@ -1,17 +1,27 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { quotes } from "../../utils/quotes.js";
-import { getAllMoods, moodLayout, quoteNumber } from "../../utils/storage.js";
+import {
+  getAllMoods,
+  getSetting,
+  moodLayout,
+  quoteNumber,
+} from "../../utils/storage.js";
 
 export default function Home() {
   const router = useRouter();
   const [todayMood, setTodayMood] = useState(null);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
-    const loadMood = async () => {
+    const load = async () => {
       const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
       const moods = await getAllMoods();
+      const username = await getSetting("Username");
+
+      setUsername(username.replace(/['"]/g, ""));
 
       console.log("Loaded moods:", moods);
 
@@ -23,12 +33,23 @@ export default function Home() {
       }
     };
 
-    loadMood();
+    load();
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome Back</Text>
+      <TouchableOpacity
+        style={styles.settingsBtn}
+        onPress={() => router.push("../home/settings")}
+      >
+        <Ionicons name="settings-outline" size={28} color="#EAE3D7" />
+      </TouchableOpacity>
+
+      <Text style={styles.title}>
+        {username != null && username != ""
+          ? `Hello ${username}!`
+          : "Welcome Back"}
+      </Text>
 
       {todayMood ? (
         <View style={styles.moodBox}>
@@ -92,10 +113,18 @@ const styles = StyleSheet.create({
     paddingTop: 70,
     alignItems: "center",
   },
+  settingsBtn: {
+    position: "absolute",
+    top: 38,
+    right: 20,
+    padding: 5,
+    zIndex: 10,
+  },
   title: {
     fontSize: 34,
     fontWeight: "700",
     fontFamily: "serif",
+    textAlign: "center",
     color: "#EAE3D7",
     letterSpacing: -0.6,
     textShadow: "0 0 10px #eae3d7be, 0 0 20px #eae3d7be, 0 0 30px #eae3d7be",

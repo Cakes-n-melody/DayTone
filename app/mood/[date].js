@@ -69,6 +69,7 @@ export default function MoodEntry() {
           value={note}
           onChangeText={setNote}
           placeholder="Something brief about the day..."
+          placeholderTextColor="#c7bfb29f"
           multiline
           style={styles.input}
         />
@@ -87,7 +88,7 @@ export default function MoodEntry() {
 }
 
 const styles = StyleSheet.create({
-  shell: { flex: 1, backgroundColor: "#1A1817", padding: 20 },
+  shell: { flex: 1, backgroundColor: "#1A1817", padding: 20, paddingTop: 50 },
   card: {
     backgroundColor: "#242220",
     borderRadius: 14,
