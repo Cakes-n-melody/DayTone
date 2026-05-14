@@ -37,4 +37,5 @@ jobs:
       - name: 💾 Upload APK for Download
         uses: actions/upload-artifact@v4
         with:
-          name: DayTone-apk
+          name: DayTone
+          path: DayTone.apk
