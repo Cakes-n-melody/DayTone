@@ -32,8 +32,7 @@ jobs:
 
       - name: 🛠️ Build App (No Expo Queue!)
         # The --local flag tells it to build right here on GitHub, skipping Expo's servers
-        run: npx eas build --platform android --profile preview --local --non-interactive --output ./
-        DayTone.apk
+        run: npx eas build --platform android --profile preview --local --non-interactive --output ./DayTone.apk
 
       - name: 💾 Upload APK for Download
         uses: actions/upload-artifact@v4
