@@ -20,14 +20,11 @@
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
-<<<<<<< HEAD
     "expo": "^56.0.12",
     "expo-constants": "^56.0.18",
-=======
     "eas-cli": "^18.12.3",
     "expo": "~54.0.25",
     "expo-constants": "~18.0.10",
->>>>>>> 0dfe95f2206deb3fee407809eb76af56eeb297fb
     "expo-font": "~14.0.9",
     "expo-haptics": "~15.0.7",
     "expo-image": "~3.0.10",
