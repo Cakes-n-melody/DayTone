@@ -1,10 +1,10 @@
 name: EAS Local Build Bypass
 on:
-  workflow_dispatch: # This adds a manual "Run workflow" button in GitHub
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # GitHub's cloud computer (has Android SDK pre-installed!)
+    runs-on: ubuntu-latest
     steps:
       - name: 🛑 Checkout Code
         uses: actions/checkout@v4
@@ -31,7 +31,6 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: 🛠️ Build App (No Expo Queue!)
-        # The --local flag tells it to build right here on GitHub, skipping Expo's servers
         run:
           npx eas build --platform android --profile preview --local
           --non-interactive --output ./DayTone.apk
