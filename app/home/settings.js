@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import { useEffect, useState } from "react";
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import {
   Platform,
   StyleSheet,
@@ -7,33 +7,33 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native';
 import {
   getSetting,
   permanentlyDeleteMood,
   saveSetting,
-} from "../../utils/storage";
+} from '../../utils/storage';
 
 export default function settings() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState('');
 
   useEffect(() => {
     async function getPreferences() {
-      const savedUsername = await getSetting("Username", "");
+      const savedUsername = await getSetting('Username', '');
       setUsername(savedUsername);
 
-      const usernames = await getSetting("Username");
-      console.log("Usernames: ", usernames);
+      const usernames = await getSetting('Username');
+      console.log('Usernames: ', usernames);
     }
     getPreferences();
   }, []);
 
   const setName = async (name) => {
     setUsername(name);
-    await saveSetting("Username", name);
+    await saveSetting('Username', name);
 
-    console.log("Username just saved: ", name);
+    console.log('Username just saved: ', name);
   };
 
   return (
@@ -46,8 +46,8 @@ export default function settings() {
         <TextInput
           value={username}
           onChangeText={setName}
-          placeholder="name here..."
-          placeholderTextColor="#c7bfb29f"
+          placeholder='name here...'
+          placeholderTextColor='#c7bfb29f'
           singleline
           style={styles.input}
         />
@@ -57,7 +57,7 @@ export default function settings() {
         <Text style={styles.dateTitle}>Restore Deleted Moods : </Text>
 
         <TouchableOpacity
-          style={[styles.Btn, { backgroundColor: "#1f3980e9" }]}
+          style={[styles.Btn, { backgroundColor: '#1f3980e9' }]}
           onPress={() => {
             router.push(`../home/moodsRestore`);
           }}
@@ -70,10 +70,23 @@ export default function settings() {
         <Text style={styles.dateTitle}>Permanently Delete Moods : </Text>
 
         <TouchableOpacity
-          style={[styles.Btn, { backgroundColor: "#80231f" }]}
+          style={[styles.Btn, { backgroundColor: '#80231f' }]}
           onPress={permanentlyDeleteMood}
         >
           <Text style={styles.deleteText}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.dateTitle}>Notifications : </Text>
+
+        <TouchableOpacity
+          style={[styles.Btn, { backgroundColor: '#1f3980e9' }]}
+          onPress={() => {
+            router.push(`../home/notifications`);
+          }}
+        >
+          <Text style={styles.deleteText}>Manage</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -83,41 +96,41 @@ export default function settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#121110",
+    backgroundColor: '#121110',
     padding: 20,
     paddingTop: 50,
   },
   title: {
     fontSize: 32,
-    fontWeight: "700",
-    fontFamily: "serif",
-    color: "#EAE3D7",
-    textAlign: "center",
+    fontWeight: '700',
+    fontFamily: 'serif',
+    color: '#EAE3D7',
+    textAlign: 'center',
     marginBottom: 20,
-    textShadow: "0 0 10px #eae3d7be, 0 0 20px #eae3d7be",
+    textShadow: '0 0 10px #eae3d7be, 0 0 20px #eae3d7be',
   },
   Btn: {
     marginTop: 10,
     paddingVertical: 6,
-    backgroundColor: "#2c2c2c",
+    backgroundColor: '#2c2c2c',
     borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   deleteText: {
-    color: "#F5E9E5",
-    fontFamily: "serif",
-    fontWeight: "700",
+    color: '#F5E9E5',
+    fontFamily: 'serif',
+    fontWeight: '700',
     fontSize: 14,
   },
   card: {
-    backgroundColor: "#1a1918",
+    backgroundColor: '#1a1918',
     borderRadius: 14,
     padding: 18,
     // subtle shadow
     ...Platform.select({
       ios: {
-        shadowColor: "#000",
+        shadowColor: '#000',
         shadowOpacity: 0.06,
         shadowRadius: 12,
         shadowOffset: { width: 0, height: 6 },
@@ -128,40 +141,40 @@ const styles = StyleSheet.create({
   },
   dateTitle: {
     fontSize: 18,
-    fontWeight: "700",
-    fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
-    color: "#EAE3D7",
-    textShadow: "0 0 10px #eae3d7be, 0 0 20px #eae3d7be, 0 0 30px #eae3d7be",
+    fontWeight: '700',
+    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    color: '#EAE3D7',
+    textShadow: '0 0 10px #eae3d7be, 0 0 20px #eae3d7be, 0 0 30px #eae3d7be',
   },
   label: {
     marginTop: 4,
-    fontWeight: "600",
-    color: "#C7BFB2",
-    textShadow: "0 0 10px #c7bfb29f, 0 0 20px #c7bfb29f, 0 0 30px #c7bfb29f",
+    fontWeight: '600',
+    color: '#C7BFB2',
+    textShadow: '0 0 10px #c7bfb29f, 0 0 20px #c7bfb29f, 0 0 30px #c7bfb29f',
   },
-  row: { flexDirection: "row", justifyContent: "space-between", marginTop: 10 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 },
   swatch: {
     width: 64,
     height: 64,
     borderRadius: 12,
-    boxShadow: "0 0 12px 0px #35312E",
+    boxShadow: '0 0 12px 0px #35312E',
   },
   input: {
     marginTop: 10,
     minHeight: 40,
     borderWidth: 1,
-    borderColor: "#35312E",
+    borderColor: '#35312E',
     padding: 12,
     borderRadius: 10,
-    backgroundColor: "#2C2A28",
-    color: "#978F85",
-    textShadow: "0 0 10px #978f85c0, 0 0 20px #978f85c0, 0 0 30px #978f85c0",
+    backgroundColor: '#2C2A28',
+    color: '#978F85',
+    textShadow: '0 0 10px #978f85c0, 0 0 20px #978f85c0, 0 0 30px #978f85c0',
   },
   actions: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginTop: 12,
   },
-  cancel: { color: "#6b6158", fontWeight: "700" },
-  clear: { color: "#9c2f2f", fontWeight: "700" },
+  cancel: { color: '#6b6158', fontWeight: '700' },
+  clear: { color: '#9c2f2f', fontWeight: '700' },
 });
