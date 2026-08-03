@@ -20,7 +20,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.realcakesnmelody.DayTone"
+      "package": "com.realcakesnmelody.DayTone",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",

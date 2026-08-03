@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "702958718752",
+    "project_id": "daytone-ad9ad",
+    "storage_bucket": "daytone-ad9ad.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:702958718752:android:4f09e4fc4a282d42151145",
+        "android_client_info": {
+          "package_name": "com.realcakesnmelody.DayTone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQhrO5lbZcErXvNuiPITk31Eaabvmjfo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
