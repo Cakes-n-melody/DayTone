@@ -34,7 +34,7 @@ jobs:
         env:
           ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
         run:
-          eas build --platform android --profile development --local
+          eas build --platform android --profile preview --local
           --non-interactive --output ./DayTone.apk
 
       - name: 💾 Upload APK for Download
