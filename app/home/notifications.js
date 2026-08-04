@@ -1,6 +1,8 @@
+import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useState } from 'react';
 import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -11,26 +13,11 @@ Notifications.setNotificationHandler({
   }),
 });
 
-function schedulePushNotification() {
-  Notifications.scheduleNotificationAsync({
-    content: {
-      title: "You've got mail! 📬",
-      body: 'Here is the notification body',
-      data: { data: 'goes here' },
-    },
-    trigger: {
-      hour: 10,
-      minute: 30,
-      repeats: true,
-    },
-  });
-}
-
 async function registerForPushNotificationsAsync() {
   let token;
 
   if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
+    await Notifications.setNotificationChannelAsync('default', {
       name: 'default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 200, 200, 200],
@@ -38,11 +25,11 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
-  const { status: existingStatus } = Notifications.getPermissionsAsync();
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
   let finalStatus = existingStatus;
 
   if (existingStatus !== 'granted') {
-    const { status } = Notifications.requestPermissionsAsync();
+    const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
 
@@ -76,8 +63,47 @@ async function registerForPushNotificationsAsync() {
 
 export default function NotificationsScreen() {
   const [expoPushToken, setExpoPushToken] = useState('');
-  const [channel, setChannel] = useState([]);
+  const [channel, setChannel] = useState({});
   const [notification, setNotification] = useState(undefined);
+  const [selectedTime, setSelectedTime] = useState(new Date());
+  const defaultStyles = useDefaultStyles();
+
+  async function schedulePushNotification() {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    const now = new Date();
+
+    const timeToSchedule = new Date(selectedTime);
+    const triggerHour = timeToSchedule.getHours();
+    const triggerMinute = timeToSchedule.getMinutes();
+
+    let triggerDate = new Date();
+    triggerDate.setHours(triggerHour, triggerMinute, 0, 0);
+
+    if (triggerDate <= now) {
+      triggerDate.setDate(triggerDate.getDate() + 1);
+    }
+
+    const secondsUntilTrigger = Math.floor(
+      (triggerDate.getTime() - now.getTime()) / 1000,
+    );
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "You've got mail! 📬",
+        body: 'Here is the notification body',
+        data: { data: 'goes here' },
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: secondsUntilTrigger,
+        repeats: true,
+        channelId: 'default',
+      },
+    });
+
+    alert('This notification will be sent in 60 seconds.');
+  }
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(
@@ -85,8 +111,8 @@ export default function NotificationsScreen() {
     );
 
     if (Platform.OS === 'android') {
-      Notifications.setNotificationChannelAsync().then((value) =>
-        setChannel(value ?? []),
+      Notifications.getNotificationChannelAsync('default').then((value) =>
+        setChannel(value ?? {}),
       );
     }
 
@@ -118,12 +144,27 @@ export default function NotificationsScreen() {
         <Text>Data: {JSON.stringify(notification?.request.content.data)}</Text>
       </View>
 
-      <Button
-        title='Press to schedule a notification'
-        onPress={async () => {
-          await schedulePushNotification();
-        }}
-      />
+      <View style={styles.pickerWrapper}>
+        <Text style={styles.pickerLabel}>Choose Reminder Time:</Text>
+        <View style={styles.pickerContainer}>
+          <DateTimePicker
+            styles={defaultStyles}
+            mode='single'
+            date={selectedTime}
+            onChange={(params) => setSelectedTime(params.date)}
+            timePicker={true}
+            initialView='time'
+            use12Hours={true}
+          />
+        </View>
+
+        <Button
+          title='Save Daily Schedule'
+          onPress={async () => {
+            await schedulePushNotification();
+          }}
+        />
+      </View>
     </View>
   );
 }
@@ -137,5 +178,22 @@ const styles = StyleSheet.create({
   innerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  pickerWrapper: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  pickerLabel: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  pickerContainer: {
+    width: '100%',
+    padding: 10,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
   },
 });
