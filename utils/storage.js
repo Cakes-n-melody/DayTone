@@ -1,26 +1,56 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
-const MOODS_KEY = "DAYTONE_MOODS_V1";
-const DELETED_MOODS_KEY = "DAYTONE_DELETED_MOODS_V1";
+export const exportAsJson = async () => {
+  try {
+    const moods = await AsyncStorage.getItem('DAYTONE_MOODS_V1');
+    if (!moods) {
+      alert('No moods found to export.');
+      return;
+    }
+    const fileName = 'Backup.json';
+    const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+    await FileSystem.writeAsStringAsync(fileUri, moods, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+    const canShare = await Sharing.isAvailableAsync();
+    if (!canShare) {
+      alert('Sharing is not available on this device.');
+    }
 
-export const moodLayout = ["Awful.", "Meh.", "Okay.", "Good.", "Fantastic."];
+    await Sharing.shareAsync(fileUri, {
+      mimeType: 'application/json',
+      dialogTitle: 'Share your moods backup',
+      UTI: 'public.json',
+    });
+  } catch (error) {
+    console.error('Error exporting moods:', error);
+    alert('An error occurred while exporting moods.');
+  }
+};
+
+const MOODS_KEY = 'DAYTONE_MOODS_V1';
+const DELETED_MOODS_KEY = 'DAYTONE_DELETED_MOODS_V1';
+
+export const moodLayout = ['Awful.', 'Meh.', 'Okay.', 'Good.', 'Fantastic.'];
 export const month = new Date().getMonth() + 1;
 
 function normalizeColourFromMood(mood) {
   const map = {
-    1: "#8a241f",
-    2: "#b65a3f",
-    3: "#cdaa6b",
-    4: "#9fb987",
-    5: "#6a8c6e",
+    1: '#8a241f',
+    2: '#b65a3f',
+    3: '#cdaa6b',
+    4: '#9fb987',
+    5: '#6a8c6e',
   };
-  return map[mood] || "#ece7df";
+  return map[mood] || '#ece7df';
 }
 
 export var quoteNumber = Math.floor(Math.random() * 172);
 
 export async function getHasOpened() {
-  return await AsyncStorage.getItem("hasOpened");
+  return await AsyncStorage.getItem('hasOpened');
 }
 
 export async function setHasOpened() {
@@ -28,7 +58,7 @@ export async function setHasOpened() {
   console.log(today);
   quoteNumber = Math.floor(Math.random() * 172);
   console.log(quoteNumber);
-  return AsyncStorage.setItem("hasOpened", `true-${today}`);
+  return AsyncStorage.setItem('hasOpened', `true-${today}`);
 }
 
 export async function getAllMoods() {
@@ -39,7 +69,7 @@ export async function getAllMoods() {
     }
     return JSON.parse(raw);
   } catch (error) {
-    console.error("Failed to get moods from storage", error);
+    console.error('Failed to get moods from storage', error);
     return {};
   }
 }
@@ -55,13 +85,13 @@ export async function saveMood(date, { mood, note }) {
     const payload = {
       mood,
       moodColor: normalizeColourFromMood(mood),
-      note: note || "",
+      note: note || '',
     };
     const merged = { ...moods, [date]: payload };
     await AsyncStorage.setItem(MOODS_KEY, JSON.stringify(merged));
     return merged;
   } catch (error) {
-    console.error("Failed to save mood to storage", error);
+    console.error('Failed to save mood to storage', error);
     return null;
   }
 }
@@ -74,7 +104,7 @@ export async function getDeletedMoods() {
     }
     return JSON.parse(raw);
   } catch (error) {
-    console.error("Failed to get Deleted moods", error);
+    console.error('Failed to get Deleted moods', error);
     return {};
   }
 }
@@ -92,7 +122,7 @@ export async function deleteMood(date) {
     await AsyncStorage.setItem(MOODS_KEY, JSON.stringify(moods));
     return moods;
   } catch (error) {
-    console.error("Failed to delete mood from storage", error);
+    console.error('Failed to delete mood from storage', error);
     return null;
   }
 }
@@ -105,7 +135,7 @@ export async function permanentlyDeleteMood() {
 
     return emptyTrash;
   } catch (error) {
-    console.error("Failed to permanently delete mood from storage", error);
+    console.error('Failed to permanently delete mood from storage', error);
     return null;
   }
 }
@@ -145,6 +175,6 @@ export async function removeDeletedMood(date) {
       );
     }
   } catch (error) {
-    console.error("Failed to remove mood from trash", error);
+    console.error('Failed to remove mood from trash', error);
   }
 }

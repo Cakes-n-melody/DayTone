@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import {
+  exportAsJson,
   getSetting,
   permanentlyDeleteMood,
   saveSetting,
@@ -87,6 +88,17 @@ export default function settings() {
           }}
         >
           <Text style={styles.deleteText}>Manage</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.dateTitle}>Export Saved Moods : </Text>
+
+        <TouchableOpacity
+          style={[styles.Btn, { backgroundColor: '#1f3980e9' }]}
+          onPress={exportAsJson}
+        >
+          <Text style={styles.deleteText}>Export</Text>
         </TouchableOpacity>
       </View>
     </View>
