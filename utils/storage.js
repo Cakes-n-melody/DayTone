@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 
@@ -17,6 +18,7 @@ export const exportAsJson = async () => {
     const canShare = await Sharing.isAvailableAsync();
     if (!canShare) {
       alert('Sharing is not available on this device.');
+      return;
     }
 
     await Sharing.shareAsync(fileUri, {
@@ -27,6 +29,42 @@ export const exportAsJson = async () => {
   } catch (error) {
     console.error('Error exporting moods:', error);
     alert('An error occurred while exporting moods.');
+  }
+};
+
+export const importFromJson = async () => {
+  try {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: 'application/json',
+      copyToCacheDirectory: true,
+    });
+    if (result.canceled) {
+      return null;
+    }
+    const fileUri = result.assets[0].uri;
+
+    const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+      encoding: FileSystem.EncodingType.UTF8,
+    });
+
+    let parsedContent;
+    try {
+      parsedContent = JSON.parse(fileContent);
+    } catch (parseError) {
+      alert('The selected file is not a valid JSON file.');
+      return null;
+    }
+
+    await AsyncStorage.setItem(
+      'DAYTONE_MOODS_V1',
+      JSON.stringify(parsedContent),
+    );
+    alert('Moods imported successfully!');
+    return parsedContent;
+  } catch (error) {
+    console.error('Error importing moods:', error);
+    alert('An error occurred while importing moods.');
+    return null;
   }
 };
 
