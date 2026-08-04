@@ -95,18 +95,20 @@ export default function settings() {
       <View style={styles.card}>
         <Text style={styles.dateTitle}>Export/Import Saved Moods : </Text>
 
-        <TouchableOpacity
-          style={[styles.Btn, { backgroundColor: '#1f3980e9', width: '48%' }]}
-          onPress={exportAsJson}
-        >
-          <Text style={styles.deleteText}>Export</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.Btn, { backgroundColor: '#1f3980e9', width: '48%' }]}
-          onPress={importFromJson}
-        >
-          <Text style={styles.deleteText}>Import</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <TouchableOpacity
+            style={[styles.Btn, { backgroundColor: '#1f3980e9', width: '49%' }]}
+            onPress={exportAsJson}
+          >
+            <Text style={styles.deleteText}>Export</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.Btn, { backgroundColor: '#1f3980e9', width: '49%' }]}
+            onPress={importFromJson}
+          >
+            <Text style={styles.deleteText}>Import</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
