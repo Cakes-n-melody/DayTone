@@ -1,7 +1,13 @@
 import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useState } from 'react';
-import { Button, Platform, StyleSheet, Text, View } from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import DateTimePicker, { useDefaultStyles } from 'react-native-ui-datepicker';
 
 Notifications.setNotificationHandler({
@@ -101,8 +107,6 @@ export default function NotificationsScreen() {
         channelId: 'default',
       },
     });
-
-    alert('This notification will be sent in 60 seconds.');
   }
 
   useEffect(() => {
@@ -119,6 +123,8 @@ export default function NotificationsScreen() {
     const notificationListener = Notifications.addNotificationReceivedListener(
       (notification) => {
         setNotification(notification);
+
+        schedulePushNotification();
       },
     );
 
@@ -131,24 +137,54 @@ export default function NotificationsScreen() {
       notificationListener.remove();
       responseListener.remove();
     };
-  }, []);
+  }, [selectedTime]);
 
   return (
     <View style={styles.container}>
-      <Text>Your expo push token: {expoPushToken}</Text>
-      <Text>{`Channel: ${channel?.name}`}</Text>
-
-      <View style={styles.innerContainer}>
-        <Text>Title: {notification?.request.content.title}</Text>
-        <Text>Body: {notification?.request.content.body}</Text>
-        <Text>Data: {JSON.stringify(notification?.request.content.data)}</Text>
-      </View>
+      <Text style={styles.title}>Notifications</Text>
 
       <View style={styles.pickerWrapper}>
-        <Text style={styles.pickerLabel}>Choose Reminder Time:</Text>
+        <Text style={styles.entryText}>Choose Reminder Time:</Text>
         <View style={styles.pickerContainer}>
           <DateTimePicker
-            styles={defaultStyles}
+            styles={{
+              ...defaultStyles,
+
+              container: { backgroundColor: '#1a1918' },
+              header_text: {
+                color: '#EAE3D7',
+                fontFamily: 'serif',
+                fontWeight: 'bold',
+              },
+
+              day_name_text: {
+                color: '#C6BFB4',
+                fontFamily: 'serif',
+                fontWeight: '600',
+              },
+
+              day_text: { color: '#EAE3D7', fontFamily: 'serif' },
+
+              today: {
+                borderColor: '#80231f',
+                borderWidth: 1.5,
+                backgroundColor: 'transparent',
+              },
+              today_label: { color: '#EAE3D7', fontWeight: 'bold' },
+
+              selected: {
+                backgroundColor: '#80231f',
+                borderRadius: 8,
+              },
+              selected_label: {
+                color: '#F5E9E5',
+                fontWeight: 'bold',
+              },
+
+              range_fill: {
+                backgroundColor: '#383838',
+              },
+            }}
             mode='single'
             date={selectedTime}
             onChange={(params) => setSelectedTime(params.date)}
@@ -158,23 +194,20 @@ export default function NotificationsScreen() {
           />
         </View>
 
-        <Button
-          title='Save Daily Schedule'
+        <TouchableOpacity
+          style={styles.deleteBtn}
           onPress={async () => {
             await schedulePushNotification();
           }}
-        />
+        >
+          <Text style={styles.deleteText}>Save Daily Schedule</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-  },
   innerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -195,5 +228,111 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: '#121110',
+    padding: 20,
+    paddingTop: 50,
+  },
+
+  title: {
+    fontSize: 32,
+    fontWeight: '700',
+    fontFamily: 'serif',
+    color: '#EAE3D7',
+    textAlign: 'center',
+    marginBottom: 20,
+    textShadow: '0 0 10px #eae3d7be, 0 0 20px #eae3d7be',
+  },
+
+  deleteBtn: {
+    marginTop: 10,
+    paddingVertical: 6,
+    backgroundColor: '#1f3980e9',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  datesBtn: {
+    marginTop: 10,
+    marginBottom: 10,
+    paddingVertical: 6,
+    backgroundColor: '#2b2b2b',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  deleteText: {
+    color: '#F5E9E5',
+    fontFamily: 'serif',
+    fontWeight: '700',
+    fontSize: 14,
+    padding: 4,
+    paddingHorizontal: 8,
+  },
+
+  scroll: {
+    flex: 1,
+    borderRadius: 12,
+  },
+
+  datePicker: {
+    backgroundColor: '#1a1918',
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 10,
+    width: '100%',
+  },
+
+  empty: {
+    color: '#EAE3D7',
+    textAlign: 'center',
+    marginTop: 40,
+    opacity: 0.7,
+    fontSize: 16,
+  },
+
+  entryCard: {
+    backgroundColor: '#1a1918',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 14,
+  },
+
+  entryDate: {
+    color: '#EAE3D7',
+    fontSize: 18,
+    fontFamily: 'serif',
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+
+  moodRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  moodDot: {
+    width: 18,
+    height: 18,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+
+  entryMood: {
+    color: '#C6BFB4',
+    fontFamily: 'serif',
+    fontSize: 14,
+  },
+
+  entryText: {
+    color: '#EAE3D7',
+    fontSize: 15,
+    fontFamily: 'serif',
+    lineHeight: 20,
+    marginTop: 4,
+    paddingBottom: 24,
   },
 });
