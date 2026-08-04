@@ -103,7 +103,7 @@ export default function NotificationsScreen() {
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
         seconds: secondsUntilTrigger,
-        repeats: true,
+        repeats: false,
         channelId: 'default',
       },
     });
